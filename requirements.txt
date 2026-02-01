@@ -1,0 +1,4 @@
+openai
+reportlab
+svglib
+requests

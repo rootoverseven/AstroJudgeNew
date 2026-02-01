@@ -1,0 +1,22 @@
+# Node modules
+node_modules/
+
+# Generated files
+*.pdf
+*.log
+generated_view.html
+run_output.txt
+complete_run.log
+full_run.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/

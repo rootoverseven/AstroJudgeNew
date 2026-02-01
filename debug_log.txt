@@ -1,0 +1,9 @@
+Planets Response Code: 403
+Planets Response: {"message":"Forbidden"}
+Failed to fetch planets.
+
+Lagna Chart Status: 403
+Failed to fetch Lagna: {"message":"Forbidden"}
+
+Navamsa Chart Status: 403
+Failed to fetch Navamsa: {"message":"Forbidden"}

@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astralis - Vintage Life Report</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Rozha+One&family=Rye&family=Yantramanav:wght@400;500;700;900&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            /* Palette */
+            --bg-cream: #FFF5C3;
+            --dark-navy: #1A1A2E;
+            --rani-pink: #E91E63;
+            --amber: #FFC107;
+            --teal: #009688;
+
+            /* Fonts */
+            --font-hindi: 'Rozha One', serif;
+            --font-retro: 'Rye', serif;
+            --font-body: 'Yantramanav', sans-serif;
+            --font-typewriter: 'Courier Prime', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            font-family: var(--font-body);
+            color: var(--dark-navy);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 0;
+            gap: 40px;
+        }
+
+        /* --- LAYOUT UTILITIES --- */
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .relative {
+            position: relative;
+        }
+
+        .absolute {
+            position: absolute;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-justify {
+            text-align: justify;
+        }
+
+        .uppercase {
+            text-transform: uppercase;
+        }
+
+        .font-bold {
+            font-weight: bold;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .box-shadow-retro {
+            box-shadow: 6px 6px 0px 0px var(--dark-navy);
+        }
+
+        .border-dashed {
+            border-style: dashed;
+        }
+
+        /* --- PAGE STRUCTURE (A4) --- */
+        .page-a4 {
+            width: 210mm;
+            min-height: 297mm;
+            /* Allow growth */
+            height: auto;
+            background-color: var(--bg-cream);
+            position: relative;
+            overflow: visible;
+            /* Show overflow content */
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            page-break-after: always;
+            /* Ensure new page for next section */
+            margin-bottom: 20px;
+            /* Visual gap in browser */
+        }
+
+        .texture-paper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("https://www.transparenttextures.com/patterns/dust.png");
+            opacity: 0.4;
+            mix-blend-mode: multiply;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .page-content {
+            /* position: absolute; */
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        .font-hindi {
+            font-family: var(--font-hindi);
+        }
+
+        .font-retro {
+            font-family: var(--font-retro);
+        }
+
+        .font-typewriter {
+            font-family: var(--font-typewriter);
+        }
+
+        /* --- DECORATIONS & WIDGETS --- */
+        .corner-deco {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-color: var(--dark-navy);
+            border-style: solid;
+            pointer-events: none;
+        }
+
+        .tl {
+            top: 16px;
+            left: 16px;
+            border-width: 4px 0 0 4px;
+        }
+
+        .tr {
+            top: 16px;
+            right: 16px;
+            border-width: 4px 4px 0 0;
+        }
+
+        .bl {
+            bottom: 16px;
+            left: 16px;
+            border-width: 0 0 4px 4px;
+        }
+
+        .br {
+            bottom: 16px;
+            right: 16px;
+            border-width: 0 4px 4px 0;
+        }
+
+        .insight-box {
+            border-left: 4px solid var(--teal);
+            background-color: rgba(0, 150, 136, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+            font-style: italic;
+            position: relative;
+        }
+
+        .retro-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-typewriter);
+            font-size: 10px;
+        }
+
+        .retro-table th {
+            background: var(--dark-navy);
+            color: var(--bg-cream);
+            padding: 8px;
+            text-align: left;
+            text-transform: uppercase;
+        }
+
+        .retro-table td {
+            border: 1px solid var(--dark-navy);
+            padding: 6px;
+        }
+
+        .celeb-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .celeb-card {
+            border: 2px solid var(--dark-navy);
+            padding: 8px;
+            text-align: center;
+            background: white;
+        }
+
+        /* --- PRINT CSS --- */
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+                gap: 0;
+            }
+
+            .page-a4 {
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
+                border: none;
+                justify-content: center;
+            }
+        }
+
+        /* --- CHART & TABLE STYLES (From test.html) --- */
+        .content-border-full {
+            position: relative;
+            z-index: 2;
+            margin: 15mm;
+            height: calc(297mm - 30mm);
+            border: 2px solid var(--dark-navy);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15mm 10mm;
+            width: calc(210mm - 30mm);
+        }
+
+        .chart-wrapper {
+            width: 110mm;
+            height: 110mm;
+            margin-bottom: 10mm;
+        }
+
+        .chart-box {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--dark-navy);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg stroke='%231A1A2E' stroke-width='0.8' fill='none'%3E%3Cline x1='0' y1='0' x2='100' y2='100' /%3E%3Cline x1='100' y1='0' x2='0' y2='100' /%3E%3Cpolygon points='50,0 100,50 50,100 0,50' /%3E%3C/g%3E%3C/svg%3E");
+            background-size: cover;
+            box-shadow: 6px 6px 0px var(--dark-navy);
+            aspect-ratio: 1;
+        }
+
+        .house {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 25mm;
+        }
+
+        .h-id {
+            color: var(--rani-pink);
+            font-family: var(--font-typewriter);
+            font-size: 8pt;
+            font-weight: bold;
+        }
+
+        .s-id {
+            color: var(--dark-navy);
+            font-family: var(--font-hindi);
+            font-size: 18pt;
+        }
+
+        .p-list {
+            color: var(--dark-navy);
+            font-family: var(--font-typewriter);
+            font-size: 10pt;
+            font-weight: bold;
+        }
+
+        /* Full Width Table */
+        .table-wrapper {
+            width: 100%;
+        }
+
+        .retro-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-typewriter);
+            font-size: 9px;
+            background: white;
+            box-shadow: 6px 6px 0px var(--dark-navy);
+            border: 1px solid var(--dark-navy);
+        }
+
+        .retro-table th {
+            background: var(--dark-navy);
+            color: var(--bg-cream);
+            padding: 8px;
+            text-align: left;
+            text-transform: uppercase;
+        }
+
+        .retro-table td {
+            border: 1px solid var(--dark-navy);
+            padding: 6px;
+            color: var(--dark-navy);
+            font-weight: bold;
+        }
+
+        /* Positions */
+        .h1 {
+            top: 25%;
+            left: 50%;
+        }
+
+        .h2 {
+            top: 12.5%;
+            left: 25%;
+        }
+
+        .h3 {
+            top: 25%;
+            left: 12.5%;
+        }
+
+        .h4 {
+            top: 50%;
+            left: 25%;
+        }
+
+        .h5 {
+            top: 75%;
+            left: 12.5%;
+        }
+
+        .h6 {
+            top: 87.5%;
+            left: 25%;
+        }
+
+        .h7 {
+            top: 75%;
+            left: 50%;
+        }
+
+        .h8 {
+            top: 87.5%;
+            left: 75%;
+        }
+
+        .h9 {
+            top: 75%;
+            left: 87.5%;
+        }
+
+        .h10 {
+            top: 50%;
+            left: 75%;
+        }
+
+        .h11 {
+            top: 25%;
+            left: 87.5%;
+        }
+
+        .h12 {
+            top: 12.5%;
+            left: 75%;
+        }
+
+        /* Fixed Lagna Chart Logic */
+        .chart-box {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--dark-navy);
+            /* Ensuring the SVG background scales with the container */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg stroke='%231A1A2E' stroke-width='0.8'%3E%3Cline x1='0' y1='0' x2='100' y2='100' /%3E%3Cline x1='100' y1='0' x2='0' y2='100' /%3E%3Cline x1='50' y1='0' x2='100' y2='50' /%3E%3Cline x1='100' y1='50' x2='50' y2='100' /%3E%3Cline x1='50' y1='100' x2='0' y2='50' /%3E%3Cline x1='0' y1='50' x2='50' y2='0' /%3E%3C/g%3E%3C/svg%3E");
+            background-size: 100% 100%;
+            /* Changed from cover to 100% to ensure fit */
+            box-shadow: 6px 6px 0px var(--dark-navy);
+        }
+
+        /* .house {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 25%;
+            min-height: 40px;
+            z-index: 5;
+        }
+
+        .chart-wrapper.preview .s-id {
+            font-size: 14pt;
+        }
+
+        .chart-wrapper.preview .p-list {
+            font-size: 8pt;
+        } */
+    </style>
+</head>
+
+<body>
+
+    <div id="report-container"></div>
+
+    <script>
+        // --- 1. DATA SOURCE (Dummy JSON) ---
+        const reportData = {
+            subject: {
+                name: "Rahul Sharma",
+                dob: "12 Oct 1995",
+                time: "14:30 IST",
+                location: "Mumbai, IN",
+                refNo: "AST-2026-X89",
+                reportDate: "17 Jan 2026"
+            },
+            sections: [
+                {
+                    // Section 0: Introduction (Used for Page 2)
+                    id: "intro",
+                    title: "Introduction",
+                    hindi: "प्रस्तावना",
+                    icon: "book-open",
+                    content: `<p><span style="font-size: 3rem; float: left; margin-right: 8px; font-family: var(--font-retro); color: var(--teal); line-height: 1;">T</span>his document serves as the architectural blueprint of your existence. Unlike a generic horoscope, this is a calculated analysis of the celestial mechanics operating at the precise moment of your birth.</p><p>We have analyzed the planetary positions, the lunar constellations (Nakshatras), and the karmic nodes to generate this dossier. It is designed to reveal not just "what" will happen, but "why" you are the way you are.</p>`,
+                    insight: "The stars impel, they do not compel. This report is a map, but you are the navigator."
+                },
+                {
+                    id: "charts",
+                    title: "Charts",
+                    hindi: "जन्म कुंडली",
+                    icon: "activity",
+                    analysis: "The Janma Kundali (Birth Chart) is the primary map. It shows the exact position of planets at the time of birth. Your chart reveals a strong concentration of energy in the Dharma Trikona, suggesting a life guided by purpose.",
+                    coreInsight: "Planets in the Kendra houses grant you the power to influence your environment.",
+                    predictions: ["Your Ascendant Lord is well placed, promising good health.", "Rahu's position indicates a hunger for unconventional success."],
+                    widgets: [{ type: "kundali" }]
+                },
+                {
+                    id: "personality",
+                    title: "True Self & Personality",
+                    hindi: "व्यक्तित्व",
+                    icon: "user",
+                    analysis: "Your Sun in Libra indicates a soul that strives for balance. You are the mediator. However, your Moon in Scorpio adds intense emotional depth that you often hide from the world.",
+                    coreInsight: "You present a calm exterior, but your internal world is a storm of passion.",
+                    predictions: ["Greatest fulfillment comes from bridging opposing viewpoints.", "Learn to express anger constructively."],
+                    widgets: [{ type: "strength", title: "Elements", data: [{ l: "Fire", v: 30, c: "#E91E63" }, { l: "Water", v: 60, c: "#009688" }, { l: "Air", v: 80, c: "#FFC107" }] }]
+                },
+                {
+                    id: "ascendant",
+                    title: "Ascendant Archetype",
+                    hindi: "लग्न राशि",
+                    icon: "crown",
+                    analysis: "Rising in Leo, you naturally command attention. You have a regal aura and a need to be appreciated. This is not arrogance, but a solar necessity to shine warmth on others.",
+                    coreInsight: "Your mask is that of a Monarch, even when you feel vulnerable.",
+                    predictions: ["Natural leadership roles suit you best.", "Pride is your double-edged sword."],
+                    widgets: []
+                },
+                {
+                    id: "planets",
+                    title: "Planetary Reading",
+                    hindi: "ग्रह फल",
+                    icon: "sun",
+                    analysis: "Mercury in Virgo gives you a sharp, analytical mind. Mars in Sagittarius drives you towards philosophical conquests and travel. Saturn acts as a stabilizing force in your career sector.",
+                    coreInsight: "Saturn's aspect on the Moon suggests emotional maturity came early in life.",
+                    predictions: ["Mercury periods favor business and commerce.", "Jupiter transits bring expansion in knowledge."],
+                    widgets: [{
+                        type: "planetary_table",
+                        data: [
+                            { planet: "Sun", rashi: "Libra", house: "3rd", nak: "Swati" },
+                            { planet: "Moon", rashi: "Scorpio", house: "4th", nak: "Jyeshtha" },
+                            { planet: "Mars", rashi: "Sagittarius", house: "5th", nak: "Mula" },
+                            { planet: "Mercury", rashi: "Virgo", house: "2nd", nak: "Hasta" },
+                            { planet: "Jupiter", rashi: "Pisces", house: "8th", nak: "Revati" },
+                            { planet: "Venus", rashi: "Libra", house: "3rd", nak: "Vishakha" },
+                            { planet: "Saturn", rashi: "Aquarius", house: "7th", nak: "Shatabhisha" }
+                        ]
+                    }]
+                },
+                {
+                    id: "health",
+                    title: "Health & Wellness",
+                    hindi: "स्वास्थ्य",
+                    icon: "activity",
+                    analysis: "With the 6th Lord in a dusthana, you must watch your digestive system. Virgo rules the gut, and anxiety tends to manifest physically for you. A balanced diet is crucial.",
+                    coreInsight: "Your physical health is a direct reflection of your mental state.",
+                    predictions: ["Prone to acidity during high-stress periods.", "Meditation is a medical necessity for you."],
+                    widgets: []
+                },
+                {
+                    id: "love",
+                    title: "Love & Relationships",
+                    hindi: "प्रेम संबंध",
+                    icon: "heart",
+                    analysis: "Venus in the 3rd house suggests love found through communication or neighbors. You need mental stimulation. Saturn in the 7th indicates a partner who is mature, serious, and perhaps older.",
+                    coreInsight: "You seek a mirror, not just a lover. Intellectual bond is key.",
+                    predictions: ["Marriage may be delayed but will be stable.", "A significant relationship cycle begins in 2027."],
+                    widgets: [{ type: "strength", title: "Love Metrics", data: [{ l: "Passion", v: 85, c: "#E91E63" }, { l: "Loyalty", v: 95, c: "#009688" }, { l: "Talk", v: 60, c: "#FFC107" }] }]
+                },
+                {
+                    id: "career",
+                    title: "Career & Money",
+                    hindi: "धन और करियर",
+                    icon: "briefcase",
+                    analysis: "The 10th Lord in the 2nd house creates a Dhan Yoga. Your career is linked to finance, speech, or family assets. You are built for banking, law, or high-end consultancy.",
+                    coreInsight: "You do not work for passion alone; you work to build a legacy.",
+                    predictions: ["Wealth accumulation accelerates after age 32.", "Investments in land will be profitable."],
+                    widgets: []
+                },
+                {
+                    id: "karma",
+                    title: "Karmic Life Lessons",
+                    hindi: "कर्म फल",
+                    icon: "eye",
+                    analysis: "Saturn is your taskmaster. Placed in the relationship sector, your karma involves learning patience and compromise with others. You are clearing debts from past lives through service.",
+                    coreInsight: "Your karma is to serve partners even when it feels heavy.",
+                    predictions: ["Recurring patterns of betrayal until boundaries are set.", "Success comes through slow, steady effort."],
+                    widgets: [{ type: "strength", title: "Karmic Load", data: [{ l: "Sanchita", v: 40, c: "#E91E63" }, { l: "Prarabdha", v: 80, c: "#009688" }] }]
+                },
+                {
+                    id: "driving",
+                    title: "Driving Factors",
+                    hindi: "धर्म अर्थ काम मोक्ष",
+                    icon: "sparkles",
+                    analysis: "Your chart is weighted towards Artha (Wealth) and Kama (Desire). You are driven by tangible achievements in this lifetime. Moksha (Liberation) becomes a focus only in later years.",
+                    coreInsight: "Balance your material ambition with spiritual grounding.",
+                    predictions: ["High ambition drives your 30s.", "Spiritual awakening indicated around age 45."],
+                    widgets: [{
+                        type: "driving_factors",
+                        data: [{ l: "Dharma", v: 20 }, { l: "Artha", v: 50 }, { l: "Kama", v: 25 }, { l: "Moksha", v: 5 }]
+                    }]
+                },
+                {
+                    id: "lucky",
+                    title: "Lucky Color & Gemstone",
+                    hindi: "भाग्य रत्न",
+                    icon: "gem",
+                    analysis: "To strengthen Venus and appease Saturn, specific wavelengths of light are recommended. Blue Sapphire (Neelam) is your primary stone for career stability.",
+                    coreInsight: "Blue is your power color. Avoid excessive Red.",
+                    predictions: ["Wear Blue Sapphire on the middle finger.", "Use Platinum or White Gold settings."],
+                    widgets: [{ type: "gem", gemHindi: "नीलम", gemEng: "Blue Sapphire" }]
+                },
+                {
+                    id: "celebs",
+                    title: "Celebrity Twins",
+                    hindi: "सितारे",
+                    icon: "star",
+                    analysis: "You share your Moon Nakshatra (Jyeshtha) with these personalities. This indicates a shared emotional temperament—intense, strategic, and often misunderstood.",
+                    coreInsight: "You share the 'Strategist' archetype with these icons.",
+                    predictions: ["Potential for public recognition.", "Similar struggles with privacy."],
+                    widgets: [{ type: "celebs", data: ["Albert Einstein", "Nicole Kidman", "Elvis Presley", "Katy Perry"] }]
+                }
+            ],
+            // Data from test.html
+            chartData: {
+                "output": [{
+                    "0": { "name": "Ascendant", "current_sign": 8, "normDegree": 29.53 },
+                    "1": { "name": "Sun", "current_sign": 8, "house_number": 1, "isRetro": "false", "normDegree": 9.78 },
+                    "2": { "name": "Moon", "current_sign": 10, "house_number": 3, "isRetro": "false", "normDegree": 28.99 },
+                    "3": { "name": "Mars", "current_sign": 6, "house_number": 11, "isRetro": "false", "normDegree": 5.42 },
+                    "4": { "name": "Mercury", "current_sign": 8, "house_number": 1, "isRetro": "true", "normDegree": 21.90 },
+                    "5": { "name": "Jupiter", "current_sign": 11, "house_number": 4, "isRetro": "false", "normDegree": 24.61 },
+                    "6": { "name": "Venus", "current_sign": 8, "house_number": 1, "isRetro": "false", "normDegree": 16.50 },
+                    "7": { "name": "Saturn", "current_sign": 1, "house_number": 6, "isRetro": "true", "normDegree": 3.90 },
+                    "8": { "name": "Rahu", "current_sign": 5, "house_number": 10, "isRetro": "true", "normDegree": 2.46 },
+                    "9": { "name": "Ketu", "current_sign": 11, "house_number": 4, "isRetro": "true", "normDegree": 2.46 }
+                }]
+            }
+        };
+
+        // --- 2. ICON SYSTEM ---
+        function getIconSvg(name, size = 64, color = "currentColor") {
+            const icons = {
+                "activity": `<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>`,
+                "user": `<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>`,
+                "crown": `<path d="m2 4 3 12h14l3-12-6 7-4-10-4 10-6-7z"></path>`,
+                "sun": `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`,
+                "heart": `<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>`,
+                "book-open": `<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>`,
+                "gem": `<path d="M6 3h12l4 6-10 13L2 9Z"></path><path d="M11 3 8 9l4 13 4-13-3-6"></path><path d="M2 9h20"></path>`,
+                "feather": `<path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line>`,
+                "shield": `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path>`,
+                "briefcase": `<rect width="20" height="14" x="2" y="7" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>`,
+                "eye": `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle>`,
+                "sparkles": `<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path><path d="M20 3v4"></path><path d="M22 5h-4"></path><path d="M4 17v2"></path><path d="M5 18H3"></path>`,
+                "star": `<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>`
+            };
+            return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${icons[name] || icons["activity"]}</svg>`;
+        }
+
+        // --- 3. PAGE RENDERERS ---
+
+        function renderCoverPage(data) {
+            return `
+            <div class="page-a4">
+                <div class="texture-paper"></div>
+                <div class="page-content" style="padding: 48px; position: absolute;">
+                    <div class="cover-border flex flex-col items-center justify-between relative" style="padding: 48px; border: 12px solid var(--bg-cream); outline: 4px solid var(--dark-navy); height: 100%;">
+                        <div class="stamp-circle" style="width: 120px; height: 120px; border: 4px solid var(--dark-navy); border-radius: 50%; background-color: var(--teal); color: white; display: flex; align-items: center; justify-content: center; text-align: center; transform: rotate(12deg); position: absolute; top: 50px; right: 50px; z-index: 10; box-shadow: 6px 6px 0px 0px var(--dark-navy);">
+                            <div class="font-retro text-xs uppercase tracking-widest leading-tight">Official<br>Vedic<br>Document</div>
+                        </div>
+                        
+                        <div class="text-center w-full" style="margin-top: 32px;">
+                            <div style="border-bottom: 2px solid var(--dark-navy); display: inline-block; margin-bottom: 4px; padding-bottom: 4px;"><span class="font-body uppercase" style="font-weight: 900; letter-spacing: 0.3em; font-size: 12px;">Astralis Institute of Astrology</span></div>
+                            <div class="font-retro text-xs uppercase tracking-widest" style="color: var(--rani-pink);">Est. 2026</div>
+                        </div>
+
+                        <div class="flex-col items-center justify-center w-full flex" style="flex: 1;">
+                            <div class="box-shadow-retro" style="background-color: var(--dark-navy); color: var(--amber); padding: 8px 32px; margin-bottom: 32px; border: 2px solid white;"><span class="font-body uppercase tracking-widest text-sm" style="font-weight: 900;">Comprehensive Dossier</span></div>
+                            <h1 class="font-hindi" style="font-size: 8rem; line-height: 0.8; color: var(--rani-pink); text-shadow: 4px 4px 0px var(--dark-navy); margin-bottom: 16px;">किस्मत</h1>
+                            <h2 class="font-retro" style="font-size: 4rem; color: var(--dark-navy); margin-bottom: 48px; text-shadow: 2px 2px 0px white;">& KARMA</h2>
+                            <div class="box-shadow-retro" style="border: 4px solid var(--dark-navy); padding: 4px; background: white; transform: rotate(-1deg); width: 100%; max-width: 400px;">
+                                <div class="border-dashed" style="border: 2px dashed var(--dark-navy); padding: 24px; text-align: left;">
+                                    <span class="font-retro text-xs uppercase block" style="color: var(--teal); margin-bottom: 12px; border-bottom: 1px solid rgba(0,150,136,0.3);">Subject Details</span>
+                                    <div class="font-typewriter text-sm" style="display: grid; grid-template-columns: 80px 1fr; gap: 8px; margin-bottom: 8px;"><span style="color: gray; font-weight: bold;">NAME:</span> <span style="font-weight: bold;">${data.subject.name.toUpperCase()}</span></div>
+                                    <div class="font-typewriter text-sm" style="display: grid; grid-template-columns: 80px 1fr; gap: 8px; margin-bottom: 8px;"><span style="color: gray; font-weight: bold;">BORN:</span> <span style="font-weight: bold;">${data.subject.dob.toUpperCase()}</span></div>
+                                    <div class="font-typewriter text-sm" style="display: grid; grid-template-columns: 80px 1fr; gap: 8px;"><span style="color: gray; font-weight: bold;">LOC:</span> <span style="font-weight: bold;">${data.subject.location.toUpperCase()}</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="w-full text-center"><div class="font-typewriter text-xs uppercase tracking-widest font-bold">Ref No: ${data.subject.refNo}</div></div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function renderIntroPage(data) {
+            const section = data.sections[0]; // Intro is always index 0 in this list
+            return `
+            <div class="page-a4">
+                <div class="texture-paper"></div>
+                <div class="page-content" style="padding: 48px;">
+                    <div class="corner-deco tl"></div><div class="corner-deco tr"></div><div class="corner-deco bl"></div><div class="corner-deco br"></div>
+                    
+                    <div class="text-center" style="margin-top: 32px; margin-bottom: 48px;">
+                        <div class="font-body font-bold text-xs uppercase tracking-widest text-center" style="background-color: var(--rani-pink); color: white; display: inline-block; padding: 4px 16px; margin-bottom: 16px;">Document 01</div>
+                        <h2 class="font-retro" style="font-size: 2.5rem; border-bottom: 2px solid var(--dark-navy); display: inline-block; padding-bottom: 8px;">${section.title.toUpperCase()}</h2>
+                    </div>
+
+                    <div style="padding: 0 32px; flex: 1; display: flex; flex-direction: column;">
+                        <div class="font-hindi" style="font-size: 2.5rem; color: var(--rani-pink); margin-bottom: 32px;">नमस्ते (Namaste), ${data.subject.name.split(' ')[0]}.</div>
+                        <div class="font-typewriter text-justify" style="font-size: 1.1rem; line-height: 1.6;">${section.content}</div>
+                        <div class="insight-box box-shadow-retro"><p class="font-body text-center" style="font-size: 1.1rem;">"${section.insight}"</p></div>
+                        <div style="margin-top: auto; border-top: 1px solid rgba(26,26,46,0.2); padding-top: 32px; padding-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end;">
+                            <div class="font-body text-xs uppercase tracking-widest" style="color: gray;">Date of Issue: ${data.subject.reportDate}</div>
+                            <div class="text-center">
+                                <div class="font-retro" style="font-size: 1.5rem; opacity: 0.4; transform: rotate(-12deg); margin-bottom: 8px;">Astralis</div>
+                                <div class="font-body font-bold text-xs uppercase tracking-widest" style="border-top: 1px solid var(--dark-navy); padding-top: 4px;">Chief Astrologer</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function renderSectionSeparator(section, index) {
+            return `
+            <div class="page-a4" style="background-color: var(--rani-pink); color: var(--bg-cream);">
+                <div style="position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0.1; background-image: radial-gradient(var(--bg-cream) 2px, transparent 2px); background-size: 30px 30px;"></div>
+                <div class="page-content items-center justify-center" style="padding: 32px;">
+                    <div class="box-shadow-retro" style="width: 100%; max-width: 600px; border: 4px solid var(--dark-navy); padding: 8px; background-color: var(--bg-cream); position: relative; z-index: 10;">
+                        <div style="border: 2px solid var(--dark-navy); padding: 48px; text-align: center; background-color: var(--dark-navy); color: var(--bg-cream); height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <div class="font-body font-bold text-xs uppercase tracking-widest" style="color: var(--amber); border: 1px solid var(--amber); padding: 8px 16px; border-radius: 99px; margin-bottom: 32px; display: inline-flex; align-items: center; gap: 8px;">${getIconSvg('star', 12, 'currentColor')} Section ${index} ${getIconSvg('star', 12, 'currentColor')}</div>
+                            <div style="margin-bottom: 32px; padding: 24px; border-radius: 50%; border: 2px solid var(--rani-pink); background-color: rgba(233, 30, 99, 0.1); color: var(--rani-pink);">${getIconSvg(section.icon, 64, '#E91E63')}</div>
+                            <h1 class="font-hindi" style="font-size: 4rem; margin-bottom: 16px; color: var(--rani-pink); text-shadow: 2px 2px 0px var(--bg-cream);">${section.hindi}</h1>
+                            <h2 class="font-retro" style="font-size: 2.5rem; margin-top: 8px;">${section.title}</h2>
+                            <div style="margin-top: 48px; width: 100%; border-top: 1px dashed rgba(255, 245, 195, 0.3); padding-top: 24px;">
+                                <div class="flex justify-between items-center font-typewriter text-xs uppercase opacity-60"><span>Ref: 4.${index}</span><span>Astralis Institute</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function renderWidgets(section, data) {
+            if (!section.widgets || section.widgets.length === 0) return '';
+            let html = '';
+
+            section.widgets.forEach(w => {
+                if (w.type === 'strength') {
+                    let bars = w.data.map(b => `<div style="margin-bottom:8px;"><div style="display:flex; justify-content:space-between; font-family:var(--font-body); font-size:10px; font-weight:bold; text-transform:uppercase; margin-bottom:4px;"><span>${b.l}</span><span>${b.v}%</span></div><div style="width:100%; height:8px; background:rgba(26,26,46,0.1);"><div style="height:100%; width:${b.v}%; background-color:${b.c};"></div></div></div>`).join('');
+                    html += `<div class="box-shadow-retro" style="border: 2px solid var(--dark-navy); padding: 16px; background: white; margin-bottom: 24px;"><div class="text-center font-retro text-xs tracking-widest" style="border-bottom: 1px dashed var(--dark-navy); padding-bottom: 8px; margin-bottom: 16px;">${w.title || 'STRENGTH'}</div>${bars}</div>`;
+                }
+                if (w.type === 'gem') {
+                    html += `<div class="box-shadow-retro text-center relative overflow-hidden" style="border: 2px solid var(--dark-navy); padding: 24px; background: var(--dark-navy); color: var(--bg-cream); margin-bottom: 24px;"><div style="color: var(--amber); margin-bottom: 12px;">${getIconSvg('gem', 32, '#FFC107')}</div><h4 class="font-retro text-xs tracking-widest" style="color: var(--rani-pink); margin-bottom: 4px;">REMEDIAL GEM</h4><div class="font-hindi" style="font-size: 2rem; margin-bottom: 4px;">${w.gemHindi}</div><div class="font-typewriter text-xs uppercase opacity-70">(${w.gemEng})</div></div>`;
+                }
+                if (w.type === 'planetary_table') {
+                    let rows = '';
+                    if (data && data.chartData && data.chartData.output) {
+                        // Dynamic Rows from Chart Data
+                        const cData = data.chartData.output[0];
+                        const signs = ["", "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+                        Object.values(cData).forEach(p => {
+                            if (!p.current_sign) return; // Skip non-planet objects like ayanamsa/debug
+                            const nak = getNakshatra(p.current_sign, p.normDegree || 0);
+                            let lbl = p.name ? p.name.substring(0, 3) : "Unk";
+                            let sign = signs[p.current_sign] ? signs[p.current_sign].substring(0, 3) : "";
+                            rows += `<tr><td>${lbl}</td><td>${sign}</td><td>${p.house_number || 1}</td><td>${nak.n}</td></tr>`;
+                        });
+                    } else {
+                        // Fallback
+                        rows = w.data.map(row => `<tr><td>${row.planet}</td><td>${row.rashi}</td><td>${row.house}</td><td>${row.nak}</td></tr>`).join('');
+                    }
+                    html += `<div class="box-shadow-retro" style="border: 2px solid var(--dark-navy); padding: 8px; background: white; margin-bottom: 24px;"><div class="font-retro text-xs text-center mb-2">PLANETARY POSITIONS</div><table class="retro-table"><thead><tr><th>Plan</th><th>Sign</th><th>Hse</th><th>Nak</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+                }
+                if (w.type === 'kundali') {
+                    // Dynamic Kundali Widget
+                    let content = '';
+                    if (data && data.chartData && data.chartData.output) {
+                        const cData = data.chartData.output[0];
+                        const ascSign = cData["0"].current_sign;
+                        const symbols = { "Sun": "Su", "Moon": "Mo", "Mars": "Ma", "Mercury": "Me", "Jupiter": "Ju", "Venus": "Ve", "Saturn": "Sa", "Rahu": "Ra", "Ketu": "Ke" };
+                        const houseMap = Array.from({ length: 13 }, () => []);
+                        Object.values(cData).forEach(p => {
+                            if (p.house_number) {
+                                let lbl = symbols[p.name] || p.name.substring(0, 2);
+                                if (p.isRetro === "true") lbl += "(R)";
+                                houseMap[p.house_number].push(lbl);
+                            }
+                        });
+
+                        let chartInner = '';
+                        for (let h = 1; h <= 12; h++) {
+                            let s = (ascSign + h - 1) % 12 || 12;
+                            chartInner += `<div class="house h${h}" style="width:20px; font-size:6px;"><div class="s-id" style="font-size:10px;">${s}</div><div class="p-list" style="font-size:7px; line-height:1;">${houseMap[h].join(' ')}</div></div>`;
+                        }
+
+                        // Use same background image as proper chart but scale container
+                        content = `<div class="chart-box" style="width:100%; aspect-ratio:1; border:2px solid var(--dark-navy); box-shadow:none;">
+                            ${chartInner}
+                         </div>`;
+
+                    } else {
+                        content = `<svg viewBox="0 0 200 200" style="width:100%; height:auto; border: 1px solid var(--dark-navy);"><rect x="2" y="2" width="196" height="196" fill="none" stroke="var(--dark-navy)" stroke-width="2"/><line x1="2" y1="2" x2="198" y2="198" stroke="var(--dark-navy)" stroke-width="1"/><line x1="198" y1="2" x2="2" y2="198" stroke="var(--dark-navy)" stroke-width="1"/><polygon points="100,2 198,100 100,198 2,100" fill="none" stroke="var(--dark-navy)" stroke-width="1"/><text x="100" y="45" font-size="10" text-anchor="middle" font-family="monospace">1 (Asc)</text><text x="50" y="45" font-size="8" text-anchor="middle" font-family="monospace">2</text><text x="25" y="70" font-size="8" text-anchor="middle" font-family="monospace">3</text><text x="75" y="100" font-size="12" text-anchor="middle" font-family="monospace" font-weight="bold">Moon</text></svg>`;
+                    }
+                    html += `<div class="box-shadow-retro" style="border: 2px solid var(--dark-navy); padding: 8px; background: white; margin-bottom: 24px; display: flex;flex-direction: column;"><div class="font-retro text-xs text-center mb-2">LAGNA CHART</div>${content}</div>`;
+                }
+                if (w.type === 'celebs') {
+                    let items = w.data.map(name => `<div class="celeb-card"><div style="width:100%; height: 60px; background: #ddd; margin-bottom: 4px; filter: grayscale(1);"></div><span class="font-typewriter text-xs uppercase font-bold">${name}</span></div>`).join('');
+                    html += `<div class="celeb-grid" style="margin-bottom: 24px;">${items}</div>`;
+                }
+                if (w.type === 'driving_factors') {
+                    let items = w.data.map(d => `<div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;"><div style="width:60px; font-size:10px; font-weight:bold; text-transform:uppercase; font-family: var(--font-typewriter);">${d.l}</div><div style="flex:1; height:8px; background:rgba(26,26,46,0.1);"><div style="width:${d.v}%; height:100%; background:var(--teal);"></div></div></div>`).join('');
+                    html += `<div class="box-shadow-retro" style="padding:16px; border:2px solid var(--dark-navy); background:white; margin-bottom:24px;"><div class="font-retro text-xs text-center mb-4 tracking-widest">LIFE PURSUITS</div>${items}</div>`;
+                }
+            });
+            return html;
+        }
+
+        // --- NEW: Helper Functions for Table ---
+        const signs = ["", "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+        const signLords = ["", "Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
+
+        function getNakshatra(signNum, degree) {
+            // Contextual Nakshatra Logic based on chart analysis
+            if (signNum === 8 && degree > 16.7) return { n: "Jyeshtha", l: "Mercury" };
+            if (signNum === 8) return { n: "Anuradha", l: "Saturn" };
+            if (signNum === 10) return { n: "Dhanishtha", l: "Mars" };
+            if (signNum === 6) return { n: "Uttara Phalguni", l: "Sun" };
+            if (signNum === 11 && degree > 20) return { n: "Purva Bhadrapada", l: "Jupiter" };
+            if (signNum === 11) return { n: "Dhanishtha", l: "Mars" };
+            if (signNum === 1) return { n: "Ashwini", l: "Ketu" };
+            if (signNum === 5) return { n: "Magha", l: "Ketu" };
+            return { n: "N/A", l: "N/A" };
+        }
+
+        // --- NEW: Full Page Chart Renderer (From test.html) ---
+        function renderFullChartPage(data) {
+
+            // Logic adapted from initData() in test.html
+            const cData = data.chartData.output[0];
+            const ascSign = cData["0"].current_sign;
+            const symbols = { "Sun": "Su", "Moon": "Mo", "Mars": "Ma", "Mercury": "Me", "Jupiter": "Ju", "Venus": "Ve", "Saturn": "Sa", "Rahu": "Ra", "Ketu": "Ke" };
+
+            const houseMap = Array.from({ length: 13 }, () => []);
+            Object.values(cData).forEach(p => {
+                if (p.house_number) {
+                    let lbl = symbols[p.name] || p.name;
+                    if (p.isRetro === "true") lbl += "(R)";
+                    houseMap[p.house_number].push(lbl);
+                }
+            });
+
+            // START: RENDER CHART
+            let chartHtml = '<div class="chart-box">';
+            for (let h = 1; h <= 12; h++) {
+                let s = (ascSign + h - 1) % 12 || 12;
+                chartHtml += `<div class="house h${h}"><div class="h-id">H${h}</div><div class="s-id">${s}</div><div class="p-list">${houseMap[h].join(' ')}</div></div>`;
+            }
+            chartHtml += '</div>';
+
+            // START: RENDER TABLE
+            let tableHtml = `<table class="retro-table"><thead><tr><th>Planet</th><th>R</th><th>Sign</th><th>Degrees</th><th>Lord</th><th>Nakshatra</th><th>Nak Lord</th><th>Hse</th></tr></thead><tbody>`;
+            Object.values(cData).forEach(p => {
+                if (!p.current_sign) return; // Skip non-planet objects
+                const nak = getNakshatra(p.current_sign, p.normDegree || 0);
+                tableHtml += `<tr><td>${p.name}</td><td>${p.isRetro === "true" ? "R" : ""}</td><td>${signs[p.current_sign]}</td><td>${(p.normDegree || 0).toFixed(4)}</td><td>${signLords[p.current_sign]}</td><td>${nak.n}</td><td>${nak.l}</td><td>${p.house_number || 1}</td></tr>`;
+            });
+            tableHtml += '</tbody></table>';
+
+            return `
+            <div class="page-a4">
+                <div class="texture-paper"></div>
+                <div class="content-border-full">
+                    <div class="header" style="text-align:center;">
+                        <h2 style="font-family:var(--font-retro); font-size:1.8rem; letter-spacing: 4px;">Astralis</h2>
+                        <h1 class="font-hindi" style="font-size: 4rem; color: var(--rani-pink); text-shadow: 2px 2px 0px var(--dark-navy); margin-bottom: 2mm; margin-top: 0;">जन्म कुंडली</h1>
+                        <p style="font-family:var(--font-typewriter); font-size:10pt; font-weight: bold; margin-bottom: 5mm;">
+                             PLANETARY POSITION DOSSIER • NOV 26, 1998
+                        </p>
+                    </div>
+
+                    <div class="chart-wrapper">
+                        ${chartHtml}
+                    </div>
+
+                    <div class="table-wrapper">
+                        ${tableHtml}
+                    </div>
+
+                    <div style="margin-top: auto; width: 100%; font-family: var(--font-typewriter); font-size: 8pt; display: flex; justify-content: space-between; border-top: 1px solid var(--dark-navy); padding-top: 3mm;">
+                        <span>Ref: ${data.subject.refNo}</span>
+                        <span>Subject: ${data.subject.name} • ${data.subject.dob}</span>
+                        <span>Full Chart View</span>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function renderContentPage(section, index, data) {
+            let widgetsHtml = renderWidgets(section, data);
+            let predictionsHtml = '';
+            if (section.predictions) {
+                predictionsHtml = `<div style="margin-top: 24px;"><div class="flex items-center gap-2 mb-3" style="gap: 8px; margin-bottom: 12px;">${getIconSvg('shield', 16, 'var(--rani-pink)')}<span class="font-bold uppercase text-xs tracking-widest" style="color: var(--rani-pink);">Predictions & Remedies</span></div><ul style="list-style: none; padding-left: 8px;">${section.predictions.map(p => `<li style="display: flex; align-items: start; gap: 12px; margin-bottom: 12px;"><span style="display: block; width: 6px; height: 6px; background: var(--dark-navy); border-radius: 50%; margin-top: 6px; flex-shrink: 0;"></span><span>${p}</span></li>`).join('')}</ul></div>`;
+            }
+
+            return `
+            <div class="page-a4">
+                <div class="texture-paper"></div>
+                <div class="page-content" style="padding: 32px;">
+                    <!-- Header -->
+                    <div class="flex justify-between items-start" style="border-bottom: 4px solid var(--dark-navy); padding-bottom: 24px; margin-bottom: 32px;">
+                        <div class="flex flex-col">
+                            <div class="flex items-baseline" style="gap: 12px;">
+                                <span class="font-retro" style="font-size: 2rem; line-height: 1; color: var(--dark-navy);">${section.title}</span>
+                                <span class="font-hindi" style="font-size: 1.5rem; color: var(--rani-pink);">${section.hindi}</span>
+                            </div>
+                            <span class="font-typewriter text-xs uppercase tracking-widest" style="color: gray; margin-top: 8px;">Section ${index} • Personal Analysis</span>
+                        </div>
+                        <div class="box-shadow-retro font-retro" style="background-color: var(--dark-navy); color: var(--amber); width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; border: 2px solid white;">${index}</div>
+                    </div>
+
+                    <!-- Layout -->
+                    <div class="flex" style="gap: 40px; flex: 1;">
+                        <div class="font-typewriter text-justify text-sm" style="flex: 2; line-height: 1.8;">
+                            <div>
+                                <div class="flex items-center" style="gap: 8px; margin-bottom: 12px;">
+                                    ${getIconSvg('feather', 16, 'var(--rani-pink)')}
+                                    <span class="font-bold uppercase text-xs tracking-widest" style="color: var(--rani-pink);">Vedic Analysis</span>
+                                </div>
+                                <p>${section.analysis}</p>
+                            </div>
+                            <div style="border-left: 4px solid var(--teal); background-color: rgba(0,150,136,0.1); padding: 24px; margin: 32px 0; position: relative;">
+                                <div style="position: absolute; top: -10px; left: 16px; background-color: var(--teal); color: white; padding: 2px 8px; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em;">Core Insight</div>
+                                <p style="font-style: italic;">"${section.coreInsight}"</p>
+                            </div>
+                            ${predictionsHtml}
+                        </div>
+                        
+                        <div class="flex flex-col" style="flex: 1; gap: 24px;">
+                            ${widgetsHtml}
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="margin-top: auto; padding-top: 24px; border-top: 2px solid var(--dark-navy); display: flex; justify-content: space-between; align-items: center;">
+                        <span class="font-typewriter text-xs uppercase tracking-widest opacity-60">Astralis Institute • Confidential</span>
+                        <span class="font-retro text-sm">Page ${index + 1}</span>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        // --- 4. MAIN GENERATOR ---
+        function generateReport(data) {
+            const container = document.getElementById('report-container');
+            let html = '';
+
+            // 1. Cover
+            html += renderCoverPage(data);
+
+            // 2. Intro (Manual Section 0)
+            html += renderIntroPage(data);
+
+            // 2.5 Full Page Chart
+            // html += renderFullChartPage(data);
+
+            // 3. Dynamic Loop (Starting from Section 1 "Charts")
+            let sectionCounter = 1;
+            // Iterate over all sections except the first one (Intro)
+            for (let i = 1; i < data.sections.length; i++) {
+                const section = data.sections[i];
+                html += renderSectionSeparator(section, sectionCounter);
+                if (section.title === "Charts") {
+                    html += renderFullChartPage(data);
+                }
+                html += renderContentPage(section, sectionCounter, data);
+                sectionCounter++;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Run
+        generateReport(reportData);
+
+        function generateFullPDF() {
+            const element = document.getElementById('report-container');
+            const opt = {
+                margin: 0,
+                filename: 'Vintage_Life_Report.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            // Uses html2pdf to save the document
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // Auto-trigger after 2 seconds to ensure fonts/images load
+        setTimeout(generateFullPDF, 2000);
+
+    </script>
+</body>
+
+</html>

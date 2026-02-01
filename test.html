@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astralis - Complete Life Dossier</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Rozha+One&family=Rye&family=Yantramanav:wght@400;500;700;900&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --bg-cream: #FFF5C3;
+            --dark-navy: #1A1A2E;
+            --rani-pink: #E91E63;
+            --font-hindi: 'Rozha One', serif;
+            --font-retro: 'Rye', serif;
+            --font-typewriter: 'Courier Prime', monospace;
+        }
+
+        /* Essential Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Page Structure */
+        #report-pdf-area {
+            width: 210mm;
+            height: 297mm;
+            background-color: var(--bg-cream);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .texture-paper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("https://www.transparenttextures.com/patterns/dust.png");
+            opacity: 0.4;
+            mix-blend-mode: multiply;
+            z-index: 1;
+        }
+
+        /* Page Border */
+        .content-border {
+            position: relative;
+            z-index: 2;
+            margin: 15mm;
+            height: calc(297mm - 30mm);
+            border: 2px solid var(--dark-navy);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15mm 10mm;
+        }
+
+        .header h1 {
+            font-family: var(--font-hindi);
+            font-size: 4rem;
+            color: var(--rani-pink);
+            text-shadow: 2px 2px 0px var(--dark-navy);
+            margin-bottom: 2mm;
+        }
+
+        /* Lagna Chart */
+        .chart-wrapper {
+            width: 110mm;
+            height: 110mm;
+            margin-bottom: 10mm;
+        }
+
+        .chart-box {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--dark-navy);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg stroke='%231A1A2E' stroke-width='0.8'%3E%3Cline x1='0' y1='0' x2='100' y2='100' /%3E%3Cline x1='100' y1='0' x2='0' y2='100' /%3E%3Cline x1='50' y1='0' x2='100' y2='50' /%3E%3Cline x1='100' y1='50' x2='50' y2='100' /%3E%3Cline x1='50' y1='100' x2='0' y2='50' /%3E%3Cline x1='0' y1='50' x2='50' /%3E%3C/g%3E%3C/svg%3E");
+            background-size: cover;
+            box-shadow: 6px 6px 0px var(--dark-navy);
+        }
+
+        .house {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 25mm;
+        }
+
+        .h-id {
+            color: var(--rani-pink);
+            font-family: var(--font-typewriter);
+            font-size: 8pt;
+            font-weight: bold;
+        }
+
+        .s-id {
+            color: var(--dark-navy);
+            font-family: var(--font-hindi);
+            font-size: 18pt;
+        }
+
+        .p-list {
+            color: var(--dark-navy);
+            font-family: var(--font-typewriter);
+            font-size: 10pt;
+            font-weight: bold;
+        }
+
+        .h1 {
+            top: 25%;
+            left: 50%;
+        }
+
+        .h2 {
+            top: 12.5%;
+            left: 25%;
+        }
+
+        .h3 {
+            top: 25%;
+            left: 12.5%;
+        }
+
+        .h4 {
+            top: 50%;
+            left: 25%;
+        }
+
+        .h5 {
+            top: 75%;
+            left: 12.5%;
+        }
+
+        .h6 {
+            top: 87.5%;
+            left: 25%;
+        }
+
+        .h7 {
+            top: 75%;
+            left: 50%;
+        }
+
+        .h8 {
+            top: 87.5%;
+            left: 75%;
+        }
+
+        .h9 {
+            top: 75%;
+            left: 87.5%;
+        }
+
+        .h10 {
+            top: 50%;
+            left: 75%;
+        }
+
+        .h11 {
+            top: 25%;
+            left: 87.5%;
+        }
+
+        .h12 {
+            top: 12.5%;
+            left: 75%;
+        }
+
+        /* Full Width Table */
+        .table-wrapper {
+            width: 100%;
+        }
+
+        .retro-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-typewriter);
+            font-size: 9px;
+            background: white;
+            box-shadow: 6px 6px 0px var(--dark-navy);
+            border: 1px solid var(--dark-navy);
+        }
+
+        .retro-table th {
+            background: var(--dark-navy);
+            color: var(--bg-cream);
+            padding: 8px;
+            text-align: left;
+            text-transform: uppercase;
+        }
+
+        .retro-table td {
+            border: 1px solid var(--dark-navy);
+            padding: 6px;
+            color: var(--dark-navy);
+            font-weight: bold;
+        }
+
+        .footer-info {
+            margin-top: auto;
+            width: 100%;
+            font-family: var(--font-typewriter);
+            font-size: 8pt;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid var(--dark-navy);
+            padding-top: 3mm;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="report-pdf-area">
+        <div class="texture-paper"></div>
+        <div class="content-border">
+            <div class="header" style="text-align:center;">
+                <h2 style="font-family:var(--font-retro); font-size:1.8rem; letter-spacing: 4px;">Astralis</h2>
+                <h1>जन्म कुंडली</h1>
+                <p style="font-family:var(--font-typewriter); font-size:10pt; font-weight: bold; margin-bottom: 5mm;">
+                    PLANETARY POSITION DOSSIER • NOV 26, 1998
+                </p>
+            </div>
+
+            <div class="chart-wrapper" id="main-chart"></div>
+
+            <div class="table-wrapper" id="main-table"></div>
+
+            <div class="footer-info">
+                <span>Ref: AST-PRD-1998</span>
+                <span>Subject: Piyusha • Raipur, IN</span>
+                <span>Page 01 of 01</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const planetsResponse = {
+            "output": [{
+                "0": { "name": "Ascendant", "current_sign": 8, "normDegree": 29.53 },
+                "1": { "name": "Sun", "current_sign": 8, "house_number": 1, "isRetro": "false", "normDegree": 9.78 },
+                "2": { "name": "Moon", "current_sign": 10, "house_number": 3, "isRetro": "false", "normDegree": 28.99 },
+                "3": { "name": "Mars", "current_sign": 6, "house_number": 11, "isRetro": "false", "normDegree": 5.42 },
+                "4": { "name": "Mercury", "current_sign": 8, "house_number": 1, "isRetro": "true", "normDegree": 21.90 },
+                "5": { "name": "Jupiter", "current_sign": 11, "house_number": 4, "isRetro": "false", "normDegree": 24.61 },
+                "6": { "name": "Venus", "current_sign": 8, "house_number": 1, "isRetro": "false", "normDegree": 16.50 },
+                "7": { "name": "Saturn", "current_sign": 1, "house_number": 6, "isRetro": "true", "normDegree": 3.90 },
+                "8": { "name": "Rahu", "current_sign": 5, "house_number": 10, "isRetro": "true", "normDegree": 2.46 },
+                "9": { "name": "Ketu", "current_sign": 11, "house_number": 4, "isRetro": "true", "normDegree": 2.46 }
+            }]
+        };
+
+        const signs = ["", "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+        const signLords = ["", "Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
+
+        function getNakshatra(signNum, degree) {
+            // Contextual Nakshatra Logic based on chart analysis
+            if (signNum === 8 && degree > 16.7) return { n: "Jyeshtha", l: "Mercury" };
+            if (signNum === 8) return { n: "Anuradha", l: "Saturn" };
+            if (signNum === 10) return { n: "Dhanishtha", l: "Mars" };
+            if (signNum === 6) return { n: "Uttara Phalguni", l: "Sun" };
+            if (signNum === 11 && degree > 20) return { n: "Purva Bhadrapada", l: "Jupiter" };
+            if (signNum === 11) return { n: "Dhanishtha", l: "Mars" };
+            if (signNum === 1) return { n: "Ashwini", l: "Ketu" };
+            if (signNum === 5) return { n: "Magha", l: "Ketu" };
+            return { n: "N/A", l: "N/A" };
+        }
+
+        function initData() {
+            const data = planetsResponse.output[0];
+            const ascSign = data["0"].current_sign;
+
+            // Render Chart
+            const chartGrid = document.getElementById('main-chart');
+            const symbols = { "Sun": "Su", "Moon": "Mo", "Mars": "Ma", "Mercury": "Me", "Jupiter": "Ju", "Venus": "Ve", "Saturn": "Sa", "Rahu": "Ra", "Ketu": "Ke" };
+            const houseMap = Array.from({ length: 13 }, () => []);
+            Object.values(data).forEach(p => {
+                if (p.house_number) {
+                    let lbl = symbols[p.name] || p.name;
+                    if (p.isRetro === "true") lbl += "(R)";
+                    houseMap[p.house_number].push(lbl);
+                }
+            });
+
+            let chartHtml = '<div class="chart-box">';
+            for (let h = 1; h <= 12; h++) {
+                let s = (ascSign + h - 1) % 12 || 12;
+                chartHtml += `<div class="house h${h}"><div class="h-id">H${h}</div><div class="s-id">${s}</div><div class="p-list">${houseMap[h].join(' ')}</div></div>`;
+            }
+            chartGrid.innerHTML = chartHtml + '</div>';
+
+            // Render Table
+            let tableHtml = `<table class="retro-table"><thead><tr><th>Planet</th><th>R</th><th>Sign</th><th>Degrees</th><th>Lord</th><th>Nakshatra</th><th>Nak Lord</th><th>Hse</th></tr></thead><tbody>`;
+            Object.values(data).forEach(p => {
+                const nak = getNakshatra(p.current_sign, p.normDegree);
+                tableHtml += `<tr><td>${p.name}</td><td>${p.isRetro === "true" ? "R" : ""}</td><td>${signs[p.current_sign]}</td><td>${p.normDegree.toFixed(4)}</td><td>${signLords[p.current_sign]}</td><td>${nak.n}</td><td>${nak.l}</td><td>${p.house_number || 1}</td></tr>`;
+            });
+            document.getElementById('main-table').innerHTML = tableHtml + '</tbody></table>';
+        }
+
+        window.onload = () => {
+            initData();
+            setTimeout(() => {
+                html2pdf().set({
+                    margin: 0, filename: 'Astralis_Planetary_Report.pdf', image: { type: 'jpeg', quality: 1 },
+                    html2canvas: { scale: 3 }, jsPDF: { unit: 'mm', format: 'a4' }
+                }).from(document.getElementById('report-pdf-area')).save();
+            }, 2500);
+        };
+    </script>
+</body>
+
+</html>
