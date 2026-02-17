@@ -4,10 +4,9 @@ const path = require('path');
 const axios = require('axios');
 const readline = require('readline');
 
-// OPENROUTER API KEY - USER MUST PROVIDE
-const OPENROUTER_API_KEY = "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";
-const SITE_URL = "https://astralis.app"; // Required for OpenRouter
-const SITE_NAME = "Astralis Report";
+// OLLAMA CONFIGURATION
+const OLLAMA_BASE_URL = "http://localhost:11434/v1/chat/completions";
+const OLLAMA_MODEL = "gpt-oss:20b-cloud"; // GPT OSS 20B Cloud model
 
 // --- UTILS ---
 function askQuestion(query) {
@@ -24,11 +23,26 @@ function askQuestion(query) {
 // Map User Input to API Payload
 async function getUserInput() {
     // Default values if user presses Enter
+    // Hardcoded for debugging
+    // const dobRaw = "1998-11-26";
+    // const timeRaw = "07:55";
+    // const name = "Aditya Choudhary";
+    // const lat = 21.216;
+    // const lon = 81.323;
+
+
     const name = await askQuestion("Enter Name (Default: Aditya Choudhary): ") || "Aditya Choudhary";
     const dobRaw = await askQuestion("Enter DOB (YYYY-MM-DD) (Default: 1998-11-26): ") || "1998-11-26";
     const timeRaw = await askQuestion("Enter Time (HH:MM) (Default: 07:55): ") || "07:55";
     const lat = parseFloat(await askQuestion("Enter Latitude (Default: 21.216): ") || "21.216");
     const lon = parseFloat(await askQuestion("Enter Longitude (Default: 81.323): ") || "81.323");
+
+    // const name = await askQuestion("Enter Name (Default: Aditya Choudhary): ") || "Piyush Kumar";
+    // const dobRaw = await askQuestion("Enter DOB (YYYY-MM-DD) (Default: 1998-11-26): ") || "1999-02-24";
+    // const timeRaw = await askQuestion("Enter Time (HH:MM) (Default: 07:55): ") || "17:09";
+    // const lat = parseFloat(await askQuestion("Enter Latitude (Default: 21.216): ") || "23.674305");
+    // const lon = parseFloat(await askQuestion("Enter Longitude (Default: 81.323): ") || "86.145656");
+
 
     const [year, month, day] = dobRaw.split('-').map(Number);
     const [hour, minute] = timeRaw.split(':').map(Number);
@@ -58,60 +72,69 @@ async function getUserInput() {
 
 // --- AI CONTENT GENERATION ---
 
-const SYSTEM_PROMPT = `You are an expert Vedic Astrologer. Analyze the provided planetary data and return a JSON object for the requested section. 
-IMPORTANT:
-1. Return RAW JSON only. No markdown (no \`\`\`json), no preamble.
-2. Be specific to the planetary positions provided.
-3. Use a mystical, authoritative, yet empathetic tone.`;
+const SYSTEM_PROMPT = `You are an illuminated Vedic Astrologer, a master of Jyotish—the Science of Light. Your task is to decode the celestial hieroglyphs of a soul's descent into the physical plane. 
+
+Analyze the provided planetary data through the lens of ancient wisdom. Your voice must be:
+1. Mystical & Authoritative: Speak as one who sees the threads of destiny clearly.
+2. Educational & Clear: Whenever you mention a planet, use its English name followed by its Hindi name in parentheses—e.g., Saturn (Shani).
+3. Functional: Define the 'Duty' of the planet (e.g., Shani is the Great Teacher and Taskmaster) so the user understands its role in their life map.
+4. Hopeful & Positive: Frame every placement as a gift or a necessary lesson in the soul's blueprint.
+5. If you want to do any text formatting for content or analysis, use html tags.
+
+Very IMPORTANT:
+- Strictly stick to the provided JSON format.
+- Return RAW JSON only. No markdown (no \`\`\`json), no preamble.
+- Be hyper-specific to the degrees, signs, and house placements provided.
+- Never use generic horoscopes; speak directly to the "Native" about their specific karmic alignment.`;
 
 const PROMPTS = {
     intro: {
-        schema: `{ "content": "string (2 paragraphs)", "insight": "string (1 line punchy quote)" }`,
-        task: "Write an introduction based on the Ascendant and Moon sign. Explain that this is a calculated blueprint of their soul."
+        schema: `{ "content": "string (2 detailed paragraphs)", "insight": "string (1 line punchy quote)" }`,
+        task: "Write a mystical opening. The content should be around 1000 characters. Explain that the Udaya Lagna (Ascendant) is the physical vessel and the Moon (Chandra) is the emotional landscape. Describe this report not as a 'prediction', but as a sacred map of the vibrations they chose at the moment of their first breath. Use terms like 'Celestial Tapestry' or 'Soul's Blueprint'."
     },
     charts: {
         schema: `{ "analysis": "string", "coreInsight": "string", "predictions": ["string", "string"] }`,
-        task: "Analyze the foundational strength of the birth chart (Janma Kundali). Discuss the Ascendant placement and overall planetary distribution."
+        task: "Analyze the Janma Kundali (Birth Chart). Evaluate the foundational strength (Bala) of the chart. Discuss the distribution of planets—are they concentrated (creating intense focus) or scattered (creating diverse experiences)? Mention the impact of the 'Graha Drishti' (planetary gazes) on the overall life path, explaining that 'Drishti' is the focused energy a planet casts upon another house."
     },
     personality: {
-        schema: `{ "analysis": "string", "coreInsight": "string", "predictions": ["string", "string"], "widgets": [{ "type": "strength", "title": "Elements", "data": [{ "l": "Fire", "v": 0-100, "c": "#E91E63" }, { "l": "Water", "v": 0-100, "c": "#009688" }, { "l": "Air", "v": 0-100, "c": "#FFC107" }] }] }`,
-        task: "Analyze the person's true self based on Sun, Moon, and Ascendant. Estimate Element balance (Fire/Water/Air) based on these signs."
+        schema: `{ "analysis": "string", "coreInsight": "string", "predictions": ["string", "string"], "widgets": [{ "type": "strength", "title": "Elemental Temperament", "data": [{ "l": "Fire (Agni)", "v": 0 - 100, "c": "#E91E63" }, { "l": "Water (Jala)", "v": 0 - 100, "c": "#009688" }, { "l": "Air (Vayu)", "v": 0 - 100, "c": "#FFC107" }, { "l": "Earth (Prithvi)", "v": 0 - 100, "c": "#795548" }] }] }`,
+        task: "Synthesize the Sun (Surya - The Soul), Moon (Chandra - The Mind), and Ascendant (Lagna - The Body). Determine the native's 'Prakriti' (nature). Explain how this mix of Fire, Water, Air, and Earth dictates their temperament and psychological depth in simple, non-confusing terms."
     },
     ascendant: {
         schema: `{ "analysis": "string", "coreInsight": "string", "predictions": ["string", "string"], "widgets": [] }`,
-        task: "Deep dive into the Ascendant (Lagna) sign and its Lord. Describe their physical presence, aura, and initial impact on others."
+        task: "Deep dive into the Lagna and its Lord (Lagnesha). Describe their physical aura and the initial vibration they project. Explain that the Lagnesha is the 'Captain of the Ship' and its placement determines their self-confidence and vitality."
     },
     planets: {
-        schema: `{ "analysis": "string", "coreInsight": "string", "predictions": ["string", "string"] }`,
-        task: "Provide a general reading of the key planets (excluding Moon/Ascendant covered elsewhere). Focus on Mars, Mercury, Jupiter."
+        schema: `{ "analysis": "string", "coreInsight": "string", "predictions": ["string", "string", "string", "string", "string", "string", "string", "string", "string"] }`,
+        task: "Perform a comprehensive reading of ALL nine Grahas. For each, use the format: English Name (Hindi Name) - Role. (e.g., 'Jupiter (Guru) - The Bringer of Wisdom'). Define the specific duty of each planet: Sun (Surya/Soul), Moon (Chandra/Mind), Mars (Mangal/Energy), Mercury (Budha/Intellect), Jupiter (Guru/Wisdom), Venus (Shukra/Pleasure), Saturn (Shani/Discipline), Rahu (North Node/Obsession), and Ketu (South Node/Detachment). Provide one specific, hopeful insight for EACH planet in the predictions array, focusing on how its placement serves the native's growth."
     },
     health: {
         schema: `{ "analysis": "string", "coreInsight": "string", "predictions": ["string", "string"], "widgets": [] }`,
-        task: "Analyze health potentials based on 6th House, 6th Lord, and Sun. Mention areas of caution and wellness tips."
+        task: "Analyze the 6th House (Shatru Bhava) and the vitality of the Sun (Surya). Identify potential 'weak links' in the physical vessel. Provide mystical wellness tips focused on balancing the 'Doshas' (biological energies) through meditation or elemental alignment."
     },
     love: {
-        schema: `{ "analysis": "string", "coreInsight": "string", "predictions": ["string", "string"], "widgets": [{ "type": "strength", "title": "Love Metrics", "data": [{ "l": "Passion", "v": 0-100, "c": "#E91E63" }, { "l": "Loyalty", "v": 0-100, "c": "#009688" }, { "l": "Talk", "v": 0-100, "c": "#FFC107" }] }] }`,
-        task: "Analyze relationships based on Venus and 7th House. Estimate Love Metrics (Passion/Loyalty/Communication)."
+        schema: `{ "analysis": "string", "coreInsight": "string", "predictions": ["string", "string"], "widgets": [{ "type": "strength", "title": "Love Alchemy", "data": [{ "l": "Passion (Kama)", "v": 0 - 100, "c": "#E91E63" }, { "l": "Loyalty (Dharma)", "v": 0 - 100, "c": "#009688" }, { "l": "Emotional Unity", "v": 0 - 100, "c": "#FFC107" }] }] }`,
+        task: "Analyze the 7th House and Venus (Shukra - The Planet of Love). Explain the 'karmic contract' of their relationships. Discuss how the Moon (Chandra) influences their need for emotional safety within partnerships."
     },
     career: {
         schema: `{ "analysis": "string", "coreInsight": "string", "predictions": ["string", "string"], "widgets": [] }`,
-        task: "Analyze career/wealth based on 10th House, 2nd House, Saturn, and Jupiter. Suggest suitable fields."
+        task: "Examine the Artha Trikona (Wealth houses). Focus on the 10th Lord and Saturn (Shani - The Lord of Karma). Suggest fields where the native can achieve 'Karma Bhava'—their true soul-work. Use D10 logic to define their professional archetype."
     },
     karma: {
-        schema: `{ "analysis": "string", "coreInsight": "string", "predictions": ["string", "string"], "widgets": [{ "type": "strength", "title": "Karmic Load", "data": [{ "l": "Sanchita", "v": 0-100, "c": "#E91E63" }, { "l": "Prarabdha", "v": 0-100, "c": "#009688" }] }] }`,
-        task: "Analyze life lessons and karma based on Saturn and Rahu/Ketu. Estimate Karmic Load."
+        schema: `{ "analysis": "string", "coreInsight": "string", "predictions": ["string", "string"], "widgets": [{ "type": "strength", "title": "Karmic Weight", "data": [{ "l": "Sanchita (The Reservoir)", "v": 0 - 100, "c": "#9C27B0" }, { "l": "Prarabdha (The Arrow)", "v": 0 - 100, "c": "#3F51B5" }] }] }`,
+        task: "Explain the axis of Rahu (The Dragon's Head) and Ketu (The Dragon's Tail). Define Rahu as the 'Future Pull' and Ketu as the 'Past Wisdom.' Use Saturn (Shani) to identify the specific 'Pending Karma' or life-debt that must be paid with patience."
     },
     driving: {
-        schema: `{ "analysis": "string", "coreInsight": "string", "predictions": ["string", "string"], "widgets": [{ "type": "driving_factors", "data": [{ "l": "Dharma", "v": 0-100 }, { "l": "Artha", "v": 0-100 }, { "l": "Kama", "v": 0-100 }, { "l": "Moksha", "v": 0-100 }] }] }`,
-        task: "Analyze the 4 Purusharthas. Estimate the percentage focus on Dharma, Artha, Kama, Moksha based on planet distribution in houses."
+        schema: `{ "analysis": "string", "coreInsight": "string", "predictions": ["string", "string"], "widgets": [{ "type": "driving_factors", "data": [{ "l": "Dharma (Purpose)", "v": 0 - 100 }, { "l": "Artha (Prosperity)", "v": 0 - 100 }, { "l": "Kama (Desire)", "v": 0 - 100 }, { "l": "Moksha (Liberation)", "v": 0 - 100 }] }] }`,
+        task: "Analyze the 4 Purusharthas (Life Goals). Explain which goal dominates their current spiritual focus: Dharma (Duty), Artha (Wealth), Kama (Desire), or Moksha (Liberation)."
     },
     lucky: {
         schema: `{ "analysis": "string", "coreInsight": "string", "predictions": ["string", "string"], "widgets": [{ "type": "gem", "gemHindi": "string", "gemEng": "string" }] }`,
-        task: "Recommend a Lucky Gemstone based on the Ascendant Lord or most benefic planet. Provide name in English and Hindi."
+        task: "Recommend the most prominent 'Yoga Karaka' gemstone—the celestial filter that strengthens their most helpful planet. Explain why this specific vibration harmonizes their aura. Provide the Hindi and English name for the stone."
     },
     celebs: {
         schema: `{ "analysis": "string", "coreInsight": "string", "predictions": ["string", "string"], "widgets": [{ "type": "celebs", "data": ["string", "string", "string", "string"] }] }`,
-        task: "Identify 4 famous people who share the same Moon Sign or Nakshatra. Briefly explain the shared trait."
+        task: "Identify 4 famous personalities with the same Nakshatra (Lunar Mansion). Explain the shared 'Soul-Vibration' of that specific Nakshatra, using its name and primary characteristic (e.g., 'The Power of the Crown' for Magha)."
     }
 };
 
@@ -134,48 +157,78 @@ async function fetchSectionContent(sectionId, planetaryData) {
     console.log(`   > Asking AI for [${sectionId}]...`);
     fs.appendFileSync('ai_debug.log', `\n--- [${sectionId}] REQUEST ---\n`);
 
-    try {
-        const response = await axios.post("https://openrouter.ai/api/v1/chat/completions", {
-            model: "xiaomi/mimo-v2-flash:free", // Valid Free model found!
-            messages: [
-                { role: "system", content: SYSTEM_PROMPT },
-                { role: "user", content: userPrompt }
-            ]
-        }, {
-            headers: {
-                "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-                "HTTP-Referer": SITE_URL,
-                "X-Title": SITE_NAME,
-                "Content-Type": "application/json"
-            }
-        });
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY = 2000;
 
-        let content = response.data.choices[0].message.content.trim();
-        fs.appendFileSync('ai_debug.log', `STATUS: ${response.status}\nRAW CONTENT:\n${content}\n`);
-
-        // Robust cleanup for Markdown/JSON
-        // Replaces ```json ... ``` and ``` ... ```
-        content = content.replace(/```json\s*/g, "").replace(/```\s*/g, "");
-
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
-            return JSON.parse(content);
-        } catch (parseErr) {
-            const msg = `   ! JSON Parse Failed for [${sectionId}].`;
-            console.error(msg + ` Raw content: ${content.substring(0, 50)}...`);
-            fs.appendFileSync('ai_debug.log', `ERROR: ${msg}\n`);
-            return null;
-        }
+            const requestBody = {
+                model: OLLAMA_MODEL,
+                messages: [
+                    { role: "system", content: SYSTEM_PROMPT },
+                    { role: "user", content: userPrompt }
+                ]
+            };
 
-    } catch (e) {
-        let errMsg = "";
-        if (e.response) {
-            errMsg = `   ! AI Error [${sectionId}]: ${e.response.status} - ${JSON.stringify(e.response.data)}`;
-        } else {
-            errMsg = `   ! AI Error [${sectionId}]: ${e.message}`;
+            if (attempt === 1) {
+                fs.appendFileSync('ai_debug.log', `REQUEST BODY:\n${JSON.stringify(requestBody, null, 2)}\n`);
+            }
+
+            const response = await axios.post(OLLAMA_BASE_URL, requestBody, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            let content = response.data.choices[0].message.content.trim();
+            if (attempt === 1) { // Log mainly on first attempt or maybe all
+                fs.appendFileSync('ai_debug.log', `STATUS: ${response.status}\nRAW CONTENT (Attempt ${attempt}):\n${content}\n`);
+            }
+
+            // Robust cleanup for Markdown/JSON
+            content = content.replace(/```json\s*/g, "").replace(/```\s*/g, "");
+
+            // Helper to extract JSON from text
+            const extractJSON = (str) => {
+                const firstOpen = str.indexOf('{');
+                const lastClose = str.lastIndexOf('}');
+                if (firstOpen !== -1 && lastClose !== -1 && lastClose > firstOpen) {
+                    return str.substring(firstOpen, lastClose + 1);
+                }
+                return str;
+            };
+
+            const jsonContent = extractJSON(content);
+
+            try {
+                return JSON.parse(jsonContent);
+            } catch (parseErr) {
+                const msg = `   ! JSON Parse Failed for [${sectionId}] (Attempt ${attempt}/${MAX_RETRIES}).`;
+                console.error(msg + ` Raw content length: ${content.length}`);
+                fs.appendFileSync('ai_debug.log', `ERROR: ${msg}\nRAW CONTENT LOOKED LIKE:\n${content}\n`);
+
+                if (attempt === MAX_RETRIES) return null;
+                throw new Error("JSON Parse Failed"); // Trigger retry
+            }
+
+        } catch (e) {
+            let errMsg = "";
+            if (e.response) {
+                errMsg = `AI Error [${sectionId}]: ${e.response.status} - ${JSON.stringify(e.response.data)}`;
+            } else {
+                errMsg = `AI Error [${sectionId}]: ${e.message}`;
+            }
+
+            console.error(`   ! ${errMsg} (Attempt ${attempt}/${MAX_RETRIES})`);
+            fs.appendFileSync('ai_debug.log', `ERROR: ${errMsg}\n`);
+
+            if (attempt < MAX_RETRIES) {
+                console.log(`   > Retrying in ${RETRY_DELAY}ms...`);
+                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+            } else {
+                return null;
+            }
         }
-        console.error(errMsg);
-        fs.appendFileSync('ai_debug.log', `ERROR: ${errMsg}\n`);
-        return null;
     }
 }
 

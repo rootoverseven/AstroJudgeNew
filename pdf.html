@@ -124,6 +124,11 @@
             /* Visual gap in browser */
         }
 
+        .page-centered {
+            justify-content: center;
+            position: relative;
+        }
+
         .texture-paper {
             position: absolute;
             top: 0;
@@ -138,12 +143,41 @@
         }
 
         .page-content {
-            /* position: absolute; */
+            position: absolute;
             z-index: 2;
             width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
+        }
+
+
+        /* --- VISUAL DEBUGGING (SCREEN ONLY) --- */
+        @media screen {
+            body {
+                background-color: #333;
+                /* Darker bg to make pages pop */
+                padding: 60px;
+            }
+
+            .page-a4 {
+                border: 1px solid #ccc;
+                margin-bottom: 60px;
+                /* Big gap */
+                position: relative;
+            }
+
+            /* Add a visual "Page X" label outside the page */
+            .page-a4::before {
+                content: "PAGE BREAK";
+                position: absolute;
+                top: -30px;
+                left: 0;
+                color: white;
+                font-family: monospace;
+                font-size: 12px;
+                opacity: 0.5;
+            }
         }
 
         /* --- TYPOGRAPHY --- */
@@ -628,7 +662,7 @@
 
         function renderCoverPage(data) {
             return `
-            <div class="page-a4">
+            <div class="page-a4 page-centered">
                 <div class="texture-paper"></div>
                 <div class="page-content" style="padding: 48px; position: absolute;">
                     <div class="cover-border flex flex-col items-center justify-between relative" style="padding: 48px; border: 12px solid var(--bg-cream); outline: 4px solid var(--dark-navy); height: 100%;">
@@ -692,7 +726,7 @@
 
         function renderSectionSeparator(section, index) {
             return `
-            <div class="page-a4" style="background-color: var(--rani-pink); color: var(--bg-cream);">
+            <div class="page-a4 page-centered" style="background-color: var(--rani-pink); color: var(--bg-cream);">
                 <div style="position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0.1; background-image: radial-gradient(var(--bg-cream) 2px, transparent 2px); background-size: 30px 30px;"></div>
                 <div class="page-content items-center justify-center" style="padding: 32px;">
                     <div class="box-shadow-retro" style="width: 100%; max-width: 600px; border: 4px solid var(--dark-navy); padding: 8px; background-color: var(--bg-cream); position: relative; z-index: 10;">
@@ -844,7 +878,7 @@
                         <h2 style="font-family:var(--font-retro); font-size:1.8rem; letter-spacing: 4px;">Astralis</h2>
                         <h1 class="font-hindi" style="font-size: 4rem; color: var(--rani-pink); text-shadow: 2px 2px 0px var(--dark-navy); margin-bottom: 2mm; margin-top: 0;">जन्म कुंडली</h1>
                         <p style="font-family:var(--font-typewriter); font-size:10pt; font-weight: bold; margin-bottom: 5mm;">
-                             PLANETARY POSITION DOSSIER • NOV 26, 1998
+                             PLANETARY POSITION DOSSIER • ${data.subject.dob}
                         </p>
                     </div>
 
@@ -890,28 +924,31 @@
 
                     <!-- Layout -->
                     <div class="flex" style="gap: 40px; flex: 1;">
-                        <div class="font-typewriter text-justify text-sm" style="flex: 2; line-height: 1.8;">
+                        <div class="font-typewriter text-justify text-sm left-column" style="flex: 2; line-height: 1.8;">
                             <div>
                                 <div class="flex items-center" style="gap: 8px; margin-bottom: 12px;">
                                     ${getIconSvg('feather', 16, 'var(--rani-pink)')}
                                     <span class="font-bold uppercase text-xs tracking-widest" style="color: var(--rani-pink);">Vedic Analysis</span>
                                 </div>
-                                <p>${section.analysis}</p>
+                                <p class="analysis-text">${section.analysis}</p>
                             </div>
-                            <div style="border-left: 4px solid var(--teal); background-color: rgba(0,150,136,0.1); padding: 24px; margin: 32px 0; position: relative;">
+                            <div class="core-insight-box" style="border-left: 4px solid var(--teal); background-color: rgba(0,150,136,0.1); padding: 24px; margin: 32px 0; position: relative;">
                                 <div style="position: absolute; top: -10px; left: 16px; background-color: var(--teal); color: white; padding: 2px 8px; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em;">Core Insight</div>
-                                <p style="font-style: italic;">"${section.coreInsight}"</p>
+                                <p class="core-insight-text" style="font-style: italic;">"${section.coreInsight}"</p>
                             </div>
-                            ${predictionsHtml}
+                            <!-- Predictions Container -->
+                            <div class="predictions-container">
+                                ${predictionsHtml}
+                            </div>
                         </div>
                         
-                        <div class="flex flex-col" style="flex: 1; gap: 24px;">
+                        <div class="flex flex-col right-column" style="flex: 1; gap: 24px;">
                             ${widgetsHtml}
                         </div>
                     </div>
 
                     <!-- Footer -->
-                    <div style="margin-top: auto; padding-top: 24px; border-top: 2px solid var(--dark-navy); display: flex; justify-content: space-between; align-items: center;">
+                    <div class="page-footer" style="margin-top: auto; padding-top: 24px; border-top: 2px solid var(--dark-navy); display: flex; justify-content: space-between; align-items: center;">
                         <span class="font-typewriter text-xs uppercase tracking-widest opacity-60">Astralis Institute • Confidential</span>
                         <span class="font-retro text-sm">Page ${index + 1}</span>
                     </div>
