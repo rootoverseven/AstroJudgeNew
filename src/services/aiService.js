@@ -1,7 +1,6 @@
-const axios = require('axios');
+const { GoogleGenAI } = require('@google/genai');
 
-const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || "http://localhost:11434/v1/chat/completions";
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "gpt-oss:20b-cloud";
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const SYSTEM_PROMPT = `You are an illuminated Vedic Astrologer, a master of Jyotish—the Science of Light. Your task is to decode the celestial hieroglyphs of a soul's descent into the physical plane. 
 Analyze the provided planetary data through the lens of ancient wisdom. Your voice must be:
@@ -81,28 +80,23 @@ const fetchSectionContent = async (sectionId, planetaryData) => {
     REQUIRED JSON FORMAT: ${schema}
     `;
 
-    console.log(`   > Asking AI for [${sectionId}]...`);
+    console.log(`   > Asking Gemini AI for [${sectionId}]...`);
     const MAX_RETRIES = 3;
     const RETRY_DELAY = 2000;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
-            const requestBody = {
-                model: OLLAMA_MODEL,
-                messages: [
-                    { role: "system", content: SYSTEM_PROMPT },
-                    { role: "user", content: userPrompt }
-                ],
-                stream: false
-            };
-
-            const response = await axios.post(OLLAMA_BASE_URL, requestBody, {
-                headers: { "Content-Type": "application/json" }
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: userPrompt,
+                config: {
+                    systemInstruction: SYSTEM_PROMPT,
+                    responseMimeType: 'application/json',
+                    temperature: 0.7
+                }
             });
 
-            let content = response.data.choices[0].message.content.trim();
-            // Cleanup
-            content = content.replace(/```json\s*/g, "").replace(/```\s*/g, "");
+            let content = response.text;
 
             const extractJSON = (str) => {
                 const firstOpen = str.indexOf('{');

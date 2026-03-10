@@ -13,10 +13,10 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@google/genai": "^1.44.0",
     "@langchain/core": "^1.1.19",
     "@langchain/google-genai": "^2.1.15",
     "@prisma/client": "^5.10.2",
-    "axios": "^1.6.7",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
