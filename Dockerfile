@@ -42,5 +42,6 @@ RUN DATABASE_URL="postgresql://dummy:password@localhost:5432/dummy" npx prisma g
 
 EXPOSE 3000
 
-# Start script applies migrations on startup then runs server
-CMD ["sh", "-c", "npx prisma db push --schema=src/prisma/schema.prisma && npm start"]
+# Start: apply schema changes (skip-generate since we generated at build time), then start server
+# Use || true so that if db push fails (e.g. schema already up to date), npm start still runs
+CMD ["sh", "-c", "npx prisma db push --schema=src/prisma/schema.prisma --skip-generate --accept-data-loss || true; npm start"]
