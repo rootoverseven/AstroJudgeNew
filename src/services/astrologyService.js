@@ -1,7 +1,5 @@
-const axios = require('axios');
-
 const BASE_URL = "https://json.freeastrologyapi.com/planets";
-const API_KEY = process.env.ASTROLOGY_API_KEY || "Y3b5dVO1YEaXQR3upseq96DCdZjtrF97QDketb8b"; // Fallback to key from original script
+const API_KEY = process.env.ASTROLOGY_API_KEY || "Y3b5dVO1YEaXQR3upseq96DCdZjtrF97QDketb8b";
 
 /**
  * Format user input into the payload required by the astrology API.
@@ -21,7 +19,7 @@ const formatPayload = (input) => {
         "seconds": 0,
         "latitude": input.lat,
         "longitude": input.lon,
-        "timezone": 5.5, // Hardcoded per original script, should make dynamic later if needed
+        "timezone": 5.5,
         "config": {
             "observation_point": "topocentric",
             "ayanamsha": "lahiri",
@@ -32,23 +30,25 @@ const formatPayload = (input) => {
 
 /**
  * Fetch planetary data from the API.
- * @param {Object} payload 
+ * @param {Object} payload
  * @returns {Object} - Planetary data
  */
 const fetchPlanetaryData = async (payload) => {
     try {
-        const response = await axios.post(BASE_URL, payload, {
+        const response = await fetch(BASE_URL, {
+            method: 'POST',
             headers: {
                 "Content-Type": "application/json",
                 "x-api-key": API_KEY
-            }
+            },
+            body: JSON.stringify(payload)
         });
 
-        if (response.status !== 200) {
+        if (!response.ok) {
             throw new Error(`Astrology API Error: ${response.status}`);
         }
 
-        const planetsData = response.data;
+        const planetsData = await response.json();
 
         // Filter out unwanted planets
         if (planetsData.output && planetsData.output[0]) {
