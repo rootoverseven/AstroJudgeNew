@@ -34,8 +34,8 @@ RUN npm ci
 # Copy the rest of the application
 COPY . .
 
-# Generate Prisma Client
-RUN npx prisma generate --schema=src/prisma/schema.prisma
+# Generate Prisma Client (Dummy DATABASE_URL so Prisma CLI doesn't crash during build)
+RUN DATABASE_URL="postgresql://dummy:password@localhost:5432/dummy" npx prisma generate --schema=src/prisma/schema.prisma
 
 EXPOSE 3000
 
