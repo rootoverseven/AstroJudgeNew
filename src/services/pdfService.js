@@ -1,16 +1,15 @@
 const fs = require('fs');
 const path = require('path');
-const puppeteer = require('puppeteer');
+// Lazy-load puppeteer inside generatePDF to avoid startup failures
 
-/**
- * Generates a PDF report from the given data.
- * @param {Object} reportData - The complete report data.
- * @param {String} outputPath - Path to save the PDF.
- * @returns {Promise<String>} - Path to the generated PDF.
- */
 const generatePDF = async (reportData, outputPath) => {
+    const puppeteer = require('puppeteer');
     console.log("Starting PDF Generation...");
-    const browser = await puppeteer.launch({ headless: "new" });
+    const browser = await puppeteer.launch({
+        headless: 'new',
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    });
     const page = await browser.newPage();
 
     // 1. Load Template
