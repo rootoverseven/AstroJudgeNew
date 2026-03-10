@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(uuid())
+  email             String   @unique
+  password_hash     String
+  is_verified       Boolean  @default(false)
+  verification_token String?
+  reports           Report[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Report {
+  id             String       @id @default(uuid())
+  user_id        String
+  user           User         @relation(fields: [user_id], references: [id])
+  birth_details  Json
+  status         ReportStatus @default(PENDING_PAYMENT)
+  pdf_url        String?
+  transaction_id String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+enum ReportStatus {
+  PENDING_PAYMENT
+  PROCESSING
+  COMPLETED
+  FAILED
+}

@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: astrojudge-backend
+    env: docker
+    region: singapore # Closest to ap-south-1 Supabase region
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        sync: false # User must set this in the Render dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: OLLAMA_BASE_URL
+        sync: false # Needs to be updated if using external API like Gemini
+      - key: OLLAMA_MODEL
+        sync: false
