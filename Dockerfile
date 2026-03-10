@@ -28,6 +28,9 @@ WORKDIR /app
 # Copy package and lock file
 COPY package*.json ./
 
+# Prevent Prisma from automatically generating during npm install
+ENV PRISMA_SKIP_POSTINSTALL_GENERATE=true
+
 # Install dependencies, including dev dependencies for Prisma
 RUN npm ci
 
